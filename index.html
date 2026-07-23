@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Macforma — Gestão do site e pagamentos</title>
+<meta name="description" content="Painel de gestão da Macforma: site, transações e editor com IA. Demonstração — dados fictícios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alata&family=Questrial&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="panel-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../site/img/logo-macforma-color.png" alt="Macforma">
+    </div>
+    <p class="sidebar-tag">Painel de gestão</p>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item is-active" data-view="view-dashboard">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-item" data-view="view-transacoes">
+        <span class="nav-icon">💳</span> Transações
+        <span class="nav-badge" id="nav-badge-transacoes" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-view="view-editor">
+        <span class="nav-icon">✨</span> Editor com IA
+      </button>
+      <button class="nav-item" data-view="view-site">
+        <span class="nav-icon">🌐</span> Site
+      </button>
+      <button class="nav-item" data-view="view-config">
+        <span class="nav-icon">⚙️</span> Configurações
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <a href="../site/index.html" target="_blank" rel="noopener">↗ Ver site publicado</a>
+      <a href="https://wa.me/5522992577316" target="_blank" rel="noopener">💬 WhatsApp da academia</a>
+      <p class="sidebar-brand">Desenvolvido por Forge</p>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section class="view is-active" id="view-dashboard">
+      <div class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Visão geral do site e dos pagamentos da Macforma.</p>
+        </div>
+        <div class="topbar-actions">
+          <span class="pill-live"><span class="dot"></span>Demonstração — dados fictícios</span>
+          <button class="btn btn-accent btn-sm" id="btn-simular">+ Simular pagamento</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <p class="kpi-label">Receita (7 dias)</p>
+          <p class="kpi-value" id="kpi-receita">R$ 0</p>
+          <p class="kpi-delta" id="kpi-receita-delta"></p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Assinaturas ativas</p>
+          <p class="kpi-value" id="kpi-assinaturas">0</p>
+          <p class="kpi-delta" id="kpi-assinaturas-delta"></p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Ticket médio</p>
+          <p class="kpi-value" id="kpi-ticket">R$ 0</p>
+          <p class="kpi-delta flat">por assinatura aprovada</p>
+        </div>
+        <div class="kpi-card">
+          <p class="kpi-label">Taxa de aprovação</p>
+          <p class="kpi-value" id="kpi-aprovacao">0%</p>
+          <p class="kpi-delta flat">dos pagamentos iniciados</p>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Receita por dia</h2>
+              <p>Últimos 14 dias, pagamentos aprovados</p>
+            </div>
+            <a class="card-link" data-view-link="view-transacoes">Ver tabela completa →</a>
+          </div>
+          <div class="viz-wrap">
+            <svg class="viz-svg" id="chart-receita" role="img" aria-label="Gráfico de receita diária dos últimos 14 dias"></svg>
+            <div class="viz-tooltip"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Receita por plano</h2>
+              <p>Total aprovado, por modalidade</p>
+            </div>
+          </div>
+          <div id="chart-planos"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Transações recentes</h2>
+            <p>Últimos 6 pagamentos registrados</p>
+          </div>
+          <a class="card-link" data-view-link="view-transacoes">Ver todas →</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Cliente</th><th>Plano</th><th>Duração</th><th>Valor</th><th>Método</th><th>Status</th><th>Data</th></tr>
+            </thead>
+            <tbody id="tbody-recentes"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSAÇÕES -->
+    <section class="view" id="view-transacoes">
+      <div class="topbar">
+        <div>
+          <h1>Transações</h1>
+          <p class="subtitle">Todos os pagamentos de matrícula feitos pelo site.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline btn-sm" id="btn-simular-transacoes">+ Simular pagamento</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="filters-row">
+          <select id="filtro-status">
+            <option value="todos">Todos os status</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="pendente">Pendente</option>
+            <option value="recusado">Recusado</option>
+          </select>
+          <select id="filtro-metodo">
+            <option value="todos">Todos os métodos</option>
+            <option value="Cartão de crédito">Cartão de crédito</option>
+            <option value="Pix">Pix</option>
+          </select>
+          <input type="search" id="filtro-busca" placeholder="Buscar por cliente ou plano…">
+          <div class="filters-spacer"></div>
+          <span class="filters-count" id="filtro-count"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Cliente</th><th>Plano</th><th>Duração</th><th>Valor</th><th>Método</th><th>Status</th><th>Data</th></tr>
+            </thead>
+            <tbody id="tbody-transacoes"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITOR COM IA -->
+    <section class="view" id="view-editor">
+      <div class="topbar">
+        <div>
+          <h1>Editor com IA</h1>
+          <p class="subtitle">Descreva o que quer mudar no site — sem precisar mexer em código.</p>
+        </div>
+      </div>
+
+      <div class="chat-shell">
+        <div class="chat-banner">
+          ✨ Modo demonstração: as respostas abaixo são simuladas. Quando o projeto for fechado e a chave de integração for configurada, este chat edita os arquivos reais do site e mostra um preview antes de publicar.
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg assistant">
+            <span class="msg-tag">Preview · resposta simulada</span>
+            <p>Oi! Sou o editor do site da Macforma. Descreva em português o que você quer mudar — cor, texto, preço, fotos, horários — que eu aplico direto no site. Alguns exemplos abaixo pra começar.</p>
+          </div>
+        </div>
+        <div class="chat-suggestions">
+          <button class="chip" data-prompt="Quero trocar a cor de destaque do site para um azul mais escuro">Trocar a cor de destaque</button>
+          <button class="chip" data-prompt="Atualize o preço do plano Musculação para R$ 129 por mês">Atualizar preço de um plano</button>
+          <button class="chip" data-prompt="Troque o número de WhatsApp em todo o site">Trocar número de WhatsApp</button>
+          <button class="chip" data-prompt="Adicione um novo horário de aula de spinning às 19h">Adicionar horário de aula</button>
+        </div>
+        <form class="chat-input-row" id="chat-form">
+          <textarea id="chat-input" placeholder="Descreva a alteração que você quer no site…" rows="1"></textarea>
+          <button type="submit" class="btn btn-accent">Enviar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SITE -->
+    <section class="view" id="view-site">
+      <div class="topbar">
+        <div>
+          <h1>Site</h1>
+          <p class="subtitle">Prévia ao vivo do site institucional da Macforma.</p>
+        </div>
+        <div class="topbar-actions">
+          <a class="btn btn-outline btn-sm" href="../site/index.html" target="_blank" rel="noopener">Abrir em nova aba ↗</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="site-preview-bar">
+          <div class="status-dot-row"><span class="dot"></span>Publicado · atualizado nesta demonstração</div>
+          <a class="card-link" data-view-link="view-editor">Editar com IA →</a>
+        </div>
+        <iframe class="site-preview-frame" src="../site/index.html" title="Prévia do site Macforma" loading="lazy"></iframe>
+      </div>
+    </section>
+
+    <!-- CONFIGURAÇÕES -->
+    <section class="view" id="view-config">
+      <div class="topbar">
+        <div>
+          <h1>Configurações</h1>
+          <p class="subtitle">Ajustes de pagamento, contato e notificações.</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <div class="card">
+          <div class="card-head"><h2>Gateway de pagamento</h2></div>
+          <div class="field">
+            <label>Provedor</label>
+            <select disabled>
+              <option>A definir com o cliente</option>
+              <option>Stripe</option>
+              <option>Mercado Pago</option>
+              <option>PagSeguro</option>
+            </select>
+            <p class="field-hint">Pagamentos hoje são simulados no site. Esse campo é ativado assim que o gateway for escolhido e a integração for feita.<span class="tag-soon">Em breve</span></p>
+          </div>
+          <div class="field">
+            <label>Chave de API</label>
+            <input type="text" placeholder="•••••••••••••••• (não configurada)" disabled>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Contato</h2></div>
+          <div class="field">
+            <label>Número de WhatsApp</label>
+            <input type="text" value="(22) 99257-7316">
+            <p class="field-hint">Atualiza o botão flutuante, cabeçalho e seção de contato do site.</p>
+          </div>
+          <div class="field">
+            <label>E-mail de contato</label>
+            <input type="text" value="macforma@macforma.com.br">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Notificações</h2></div>
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">Novo pagamento aprovado</p>
+              <p class="settings-row-desc">Avisar por e-mail a cada matrícula confirmada.</p>
+            </div>
+            <div class="switch is-on" data-setting="notif-aprovado"><div class="switch-knob"></div></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">Pagamento pendente há mais de 24h</p>
+              <p class="settings-row-desc">Lembrete automático por WhatsApp para o cliente.</p>
+            </div>
+            <div class="switch" data-setting="notif-pendente"><div class="switch-knob"></div></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">Resumo semanal</p>
+              <p class="settings-row-desc">Relatório de receita e novas matrículas toda segunda-feira.</p>
+            </div>
+            <div class="switch is-on" data-setting="notif-resumo"><div class="switch-knob"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Acesso da equipe</h2></div>
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">João (Forge)</p>
+              <p class="settings-row-desc">Administrador — site, transações e editor com IA.</p>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <p class="settings-row-label">Equipe Macforma</p>
+              <p class="settings-row-desc">Convide a recepção ou gerência para acessar só as Transações.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" disabled>Convidar <span class="tag-soon">Em breve</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script src="script.js"></script>
+<script>
+  document.querySelectorAll('[data-view-link]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelector(`.nav-item[data-view="${el.dataset.viewLink}"]`)?.click();
+    });
+  });
+</script>
+</body>
+</html>
